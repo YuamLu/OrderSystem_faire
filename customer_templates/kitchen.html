@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-tw" style="height:100%">
+<head>
+	<meta charset="utf-8" name="viewport" comtent="widch=device-widch,initial-scale=1.0" />
+	<title>竹北高中209線上點餐系統</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+	<script>
+        function createXHR()
+        {
+            try
+            {
+                var XHR = new XMLHttpRequest();
+            }
+            catch(e1)
+            {
+                try
+                {
+                    var XHR = new ActiveXObject('Msxml2.XMLHTTP');
+                }
+                catch(e2)
+                {
+                    try
+                    {
+                        var XHR = new ActiveXObject('Microsoft.XMLHTTP');
+                    }
+                    catch(e3)
+                    {
+                        XHR = false;
+                    }
+                }
+            }
+            return XHR;
+        }
+    </script>
+    <script>
+    function defaultLg(id){
+        if(document.getElementById(id + "_default").style.display == "flex"){
+            document.getElementById(id + "_default").style.display = "none";
+            document.getElementById(id + "_lg").style.display = "block";
+        }else{
+            document.getElementById(id + "_default").style.display = "flex";
+            document.getElementById(id + "_lg").style.display = "none";
+        }
+    }
+    function dishDone(id){
+            let XHR = createXHR();
+            let send = {"id":id,"status":"2"}
+            XHR.open("POST","http://example.com",true)
+            XHR.setRequestHeader("Content-Type", "application/json");
+            XHR.onreadystatechange = function () {
+                if (XHR.readyState === 4) {
+                    if (XHR.status === 200) {
+                        //顯示訂單編號
+                        console.log("done")
+                    } else {
+                        // Error handling
+                        console.error("Request failed with status: " + XHR.status);
+                    }
+                }
+            };
+            XHR.send(JSON.stringify(send));
+    }
+    </script>
+    <style>
+        .item{
+            display: flex;
+            flex-wrap: nowrap;
+            width:calc(100% - 20px);
+            margin-left: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgb(206, 206, 206);
+            border-radius: 10px;
+        }
+        .inside_img{
+            
+            flex:2;
+        }
+        .inside_main{
+            
+            flex:3;
+        }
+        .inside_money{
+            flex:1;
+        }
+        .input_wrapper{
+            display: flex;
+        }
+        .input_numbutton_left{
+            border: none;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+        .input_numbutton_right{
+            border: none;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        .input_num{
+            width:35px;
+        }
+        input[type="number"] {
+            -webkit-appearance: textfield;
+            appearance: textfield;
+            margin: 0;
+        }
+        .history_btn{
+            border: none;
+            height:80px;
+            width:calc(100% - 100px);
+            margin-left: 50px;
+            border-radius: 10px;
+        }
+    </style>
+    
+</head>
+<body>
+    <strong><p align="center" style="font-size: 100px;">209廚房</p></strong>
+    <span id="items">
+        
+    </span>
+    <h2><button class="history_btn">歷史訂單</button></h2>
+        
+</body>
+<script>
+        XHR = createXHR();
+        setInterval(()=>{
+            XHR.open("GET","http://example.com/",true)
+            XHR.onreadystatechange = function () {
+                if (XHR.readyState === 4) {
+                    if (XHR.status === 200) {
+                        // Successful response
+                        var response = XHR.responseText;
+                        response = JSON.parse(response)
+                        order_list = [
+                            {
+                                "id":"example1",
+                                "item_list":[
+                                    {"name":"冰淇淋(一球)","flavor":"香草","qty":1},
+                                    {"name":"冰淇淋(三球)","flavor":"香草+草莓+巧克力","qty":1},
+                                    {"name":"炸薯條","flavor":"","qty":1}
+                                ],
+                                "total":75,
+                                "status":1    
+                            },
+                            {
+                                "id":"example2",
+                                "item_list":[
+                                    {"name":"冰淇淋(一球)","flavor":"香草","qty":1},
+                                    {"name":"冰淇淋(三球)","flavor":"香草+草莓+巧克力","qty":1},
+                                    {"name":"炸薯條","flavor":"","qty":1}
+                                ],
+                                "total":70,
+                                "status":0 
+                            }
+                        ]
+                        /*----顯示每筆訂單----*/
+                        for(let i = 0;i < order_list.length;i++){
+                            //
+                            let id = order_list[i]["id"];
+                            let htmlText = "<div id='"+order_list[i]["id"]+"' class='item' onclick='defaultLg(\""+order_list[i]["id"]+"\")'><div id='"+order_list[i]["id"]+"_default' class='item_default'><div class='order_num'>";
+                            htmlText += "<h1>"+order_list[i]["id"]+"</h1>";
+                            htmlText += "</div><div class='item_list'>";
+
+                            for(let j = 0;j < order_list[i]["item_list"].length;j++){
+                                htmlText += "<h4>-"+order_list[i]["item_list"][j]["name"]+"</h4>";
+                            }
+
+                            htmlText += "</div><div class='money'>";
+                            htmlText += "<h1 style='color: red;'>$"+order_list[i]["total"]+"</h1>";
+                            htmlText += "</div></div><div id='"+order_list[i]["id"]+"_lg'><div class='lg_upper'><div class='order_num_lg'>";
+                            htmlText += "<h1>"+order_list[i]["id"]+"</h1>";
+                            htmlText += "</div><div class='money_lg'>";
+                            htmlText += "<h1 style='color: red;'' align='right'>$"+order_list[i]["total"]+"</h1>";
+                            htmlText += "</div></div><div class='lg_middle'>";
+
+                            for(let j = 0;j < order_list[i]["item_list"].length;j++){
+                                htmlText += "<h4>-"+order_list[i]["item_list"][j]["name"]+"</h4>";
+                            }
+
+                            htmlText += "</div><div class='lg_footer'><span id='"+order_list[i]["id"]+"_buttons'></span></div></div></div>";
+                            document.getElementById("items").innerHTML = document.getElementById("items").innerHTML + htmlText;
+                        
+                            document.getElementById(id + "_default").style.display = "flex";
+                            document.getElementById(id + "_lg").style.display = "none";
+                            //分辨訂單種類
+                            if(order_list[i]["status"] == 1){
+                                document.getElementById(id + "_buttons").innerHTML = "<button type='button'>餐點已完成</button>";
+                            }
+                        }
+                        // You can parse and work with the response data here
+                        console.log(response);
+                    } else {
+                        // Error handling
+                        console.error("Request failed with status: " + xhr.status);
+                    }
+                }
+            };
+        
+            
+        },20000)
+</script>
+</html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-tw" style="height:100%">
+<head>
+	<meta charset="utf-8" name="viewport" comtent="widch=device-widch,initial-scale=1.0" />
+	<title>竹北高中209線上點餐系統</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+	<script>
+        function createXHR()
+        {
+            try
+            {
+                var XHR = new XMLHttpRequest();
+            }
+            catch(e1)
+            {
+                try
+                {
+                    var XHR = new ActiveXObject('Msxml2.XMLHTTP');
+                }
+                catch(e2)
+                {
+                    try
+                    {
+                        var XHR = new ActiveXObject('Microsoft.XMLHTTP');
+                    }
+                    catch(e3)
+                    {
+                        XHR = false;
+                    }
+                }
+            }
+            return XHR;
+        }
+    </script>
+    <script>
+        function updateTotal(){
+            let priceList = [
+                {"icecream1": 20},
+                {"icecream2": 40},
+                {"icecream3": 50},
+                {"sausage": 30},
+                {"fries": 35},
+                {"water": {
+                    "0":35,
+                    "1":40
+                }
+                },
+            ]
+            let ice1 = 20 * parseInt(document.getElementById("icecream1").value);
+            let ice2 = 40 * parseInt(document.getElementById("icecream2").value);
+            let ice3 = 50 * parseInt(document.getElementById("icecream3").value);
+            let sau = 30 * parseInt(document.getElementById("sausage").value);
+            let fries = 35* parseInt(document.getElementById("fries").value);
+            let water = 0;
+            if(document.getElementById("flavor_water").value == "0"){
+                water = 35 * parseInt(document.getElementById("water").value);
+            }else{
+                water = 40 * parseInt(document.getElementById("water").value);
+            }
+            let total = ice1+ice2+ice3+sau+fries+water;
+            document.getElementById("total").innerHTML = total.toString()
+        }
+        function submit(){
+            let send = {
+                "type":"order",
+                "item_list":[
+                    
+                ]
+            }
+            //冰(一球)
+            let legalOrder = 1;
+            if(document.getElementById("icecream1").value != "0" && legalOrder){
+                let flavor1 = document.getElementById("flavor_icecrem1-1").value
+                if(flavor1 == "-1"){
+                    legalOrder = 0;
+                    console.log("not legal");
+                    document.getElementById("notLegal").style.display = "block";
+                }else{
+                    send["item_list"].push({"id":"1","flavor":flavor1,"qty":document.getElementById("icecream1").value})
+                }
+            }
+            if(document.getElementById("icecream2").value != "0" && legalOrder){
+                let flavor1 = document.getElementById("flavor_icecrem2-1").value
+                let flavor2 = document.getElementById("flavor_icecrem2-2").value
+                if(flavor1 == "-1" || flavor2 == "-1"){
+                    legalOrder = 0;
+                    console.log("not legal");
+                    document.getElementById("notLegal").style.display = "block";
+                }else{
+                    send["item_list"].push({"id":"2","flavor":flavor1 + flavor2,"qty":document.getElementById("icecream2").value})
+                }
+            }
+            if(document.getElementById("icecream3").value != "0" && legalOrder){
+                let flavor1 = document.getElementById("flavor_icecrem3-1").value
+                let flavor2 = document.getElementById("flavor_icecrem3-2").value
+                let flavor3 = document.getElementById("flavor_icecrem3-3").value
+                if(flavor1 == "-1" || flavor2 == "-1" || flavor3 == "-1"){
+                    legalOrder = 0;
+                    console.log("not legal");
+                    document.getElementById("notLegal").style.display = "block";
+                }else{
+                    send["item_list"].push({"id":"3","flavor":flavor1 + flavor2 + flavor3,"qty":document.getElementById("icecream3").value})
+                }
+            }
+            if(document.getElementById("sausage").value != "0" && legalOrder){
+                let flavor1 = document.getElementById("flavor_sausage").value
+                if(flavor1 == "-1"){
+                    legalOrder = 0;
+                    console.log("not legal");
+                    document.getElementById("notLegal").style.display = "block";
+                }else{
+                    send["item_list"].push({"id":"4","flavor":flavor1,"qty":document.getElementById("sausage").value})
+                }
+            }
+            if(document.getElementById("fries").value != "0" && legalOrder){
+                let flavor1 = document.getElementById("flavor_fries").value
+                if(flavor1 == "-1"){
+                    legalOrder = 0;
+                    console.log("not legal");
+                    document.getElementById("notLegal").style.display = "block";
+                }else{
+                    send["item_list"].push({"id":"5","flavor":flavor1,"qty":document.getElementById("fries").value})
+                }
+            }
+            if(document.getElementById("water").value != "0" && legalOrder){
+                let flavor1 = document.getElementById("flavor_water").value
+                if(flavor1 == "-1"){
+                    legalOrder = 0;
+                    console.log("not legal");
+                    document.getElementById("notLegal").style.display = "block";
+                }else{
+                    send["item_list"].push({"id":"6","flavor":flavor1,"qty":document.getElementById("water").value})
+                }
+            }
+            if(legalOrder){
+                console.log(send)
+                XHR = createXHR();
+                XHR.open("POST","http://localhost:5000",true)
+                XHR.setRequestHeader("Content-Type", "application/json");
+                XHR.onreadystatechange = function () {
+                    if (XHR.readyState === 4) {
+                        if (XHR.status === 200) {
+                            //顯示訂單編號
+                            location.href = "http://localhost:5000/order?idx="+XHR.responseText.substring(1);
+                        } else {
+                            // Error handling
+                            console.error("Request failed with status: " + XHR.status);
+                        }
+                    }
+                };
+                XHR.send(JSON.stringify(send));
+
+            }
+        }
+        
+    </script>
+    <style>
+        .main{
+            display: block;
+            z-index: 1;
+        }
+        .orderNumber{
+            background-color: white;
+            border: 1px black solid;
+            border-radius: 20px;
+            display: none;
+            position: absolute;
+            top: 100px;
+            left: 10%;
+            width:80%;
+            height:200px ;
+            z-index: 2;
+        }
+        .item{
+            display: flex;
+            flex-wrap: nowrap;
+            width:calc(100% - 20px);
+            margin-left: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgb(206, 206, 206);
+            border-radius: 10px;
+        }
+        .inside_img{
+            
+            flex:2;
+        }
+        .inside_main{
+            
+            flex:3;
+        }
+        .inside_money{
+            flex:1;
+        }
+        .input_wrapper{
+            display: flex;
+        }
+        .input_numbutton_left{
+            border: none;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+        .input_numbutton_right{
+            border: none;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+        .input_num{
+            width:35px;
+        }
+        input[type="number"] {
+            -webkit-appearance: textfield;
+            appearance: textfield;
+            margin: 0;
+        }
+        .submit{
+            background-color: antiquewhite;
+            border: none;
+            height:fit-content;
+            width:80%;
+            margin-left: 10%;
+            margin-bottom: 50px;
+            border-radius: 10px;
+        }
+    </style>
+    
+</head>
+<body>
+    <div id="main" class="main">
+        <strong><p align="center" style="font-size: 100px;">209柑仔店</p></strong>
+        <div style="margin:20px">
+            <h1 align="center">點餐流程</h1>
+            <h1 align="center">線上下單 -> 到點付款 -> 餐點製作 -> 領取餐點</h1>
+        </div>
+        <h4>*如要兩份各不同口味請另外再下一單</h4>
+        <form>
+            <div class="item">
+                <div class="inside_img">
+
+                </div>
+                <div class="inside_main">
+                    <h1>冰淇淋(一球)</h1>
+                    <h6>早上好中國，現在我有冰淇淋</h6>
+                    <label for="flavor_icecrem1-1">選擇口味:</label>
+                    <select id="flavor_icecrem1-1">
+                        <option value="-1">請選擇</option>
+                        <option value="0">香草</option>
+                        <option value="1">草莓</option>
+                        <option value="2">巧克力</option>
+                    </select>
+                </div>
+                <div class="inside_money">
+                    <h1 style="color: red;">20$</h1>
+                    <span class="input_wrapper">
+                        <button id="minus_icecream1" type="button" class="input_numbutton_left">-</button>
+                        <input class="input_num" type="number" value="0" min="0" id="icecream1" name="icecream1">
+                        <button id="plus_icecream1" type="button" class="input_numbutton_right">+</button>
+                    </span>                
+                </div>
+            </div>
+            <div class="item">
+                <div class="inside_img">
+
+                </div>
+                <div class="inside_main">
+                    <h1>冰淇淋(兩球)</h1>
+                    <h6>早上好中國，現在我有冰淇淋</h6>
+                    <label for="flavor_icecrem2-1">選擇口味:</label>
+                    <select id="flavor_icecrem2-1">
+                        <option value="-1">請選擇</option>
+                        <option value="0">香草</option>
+                        <option value="1">草莓</option>
+                        <option value="2">巧克力</option>
+                    </select>
+                    <label for="flavor_icecrem2-1">選擇口味:</label>
+                    <select id="flavor_icecrem2-2">
+                        <option value="-1">請選擇</option>
+                        <option value="0">香草</option>
+                        <option value="1">草莓</option>
+                        <option value="2">巧克力</option>
+                    </select>
+                </div>
+                <div class="inside_money">
+                    <h1 style="color: red;">40$</h1>
+                    <span class="input_wrapper">
+                        <button id="minus_icecream2" type="button" class="input_numbutton_left">-</button>
+                        <input class="input_num" type="number" value="0" min="0" id="icecream2" name="icecream2">
+                        <button id="plus_icecream2" type="button" class="input_numbutton_right">+</button>
+                    </span>
+                </div>
+            </div>
+            <div class="item">
+                <div class="inside_img">
+
+                </div>
+                <div class="inside_main">
+                    <h1>冰淇淋(三球)</h1>
+                    <h6>早上好中國，現在我有冰淇淋</h6>
+                    <label for="flavor_icecrem3-1">選擇口味:</label>
+                    <select id="flavor_icecrem3-1">
+                        <option value="-1">請選擇</option>
+                        <option value="0">香草</option>
+                        <option value="1">草莓</option>
+                        <option value="2">巧克力</option>
+                    </select>
+                    <label for="flavor_icecrem3-2">選擇口味:</label>
+                    <select id="flavor_icecrem3-2">
+                        <option value="-1">請選擇</option>
+                        <option value="0">香草</option>
+                        <option value="1">草莓</option>
+                        <option value="2">巧克力</option>
+                    </select>
+                    <label for="flavor_icecrem3-3">選擇口味:</label>
+                    <select id="flavor_icecrem3-3">
+                        <option value="-1">請選擇</option>
+                        <option value="0">香草</option>
+                        <option value="1">草莓</option>
+                        <option value="2">巧克力</option>
+                    </select>
+                </div>
+                <div class="inside_money">
+                    <h1 style="color: red;">50$</h1>
+                    <span class="input_wrapper">
+                        <button id="minus_icecream3" type="button" class="input_numbutton_left">-</button>
+                        <input class="input_num" type="number" value="0" min="0" id="icecream3" name="icecream3">
+                        <button id="plus_icecream3" type="button" class="input_numbutton_right">+</button>
+                    </span>
+                </div>
+            </div>
+            <div class="item">
+                <div class="inside_img">
+
+                </div>
+                <div class="inside_main">
+                    <h1>烤香腸(一根)</h1>
+                    <h6>一條根</h6>
+                    <label for="flavor_sausage">選擇口味:</label>
+                    <select id="flavor_sausage">
+                        <option value="-1">請選擇</option>
+                        <option value="0">原味</option>
+                        <option value="1">蒜味</option>
+                    </select>
+                </div>
+                <div class="inside_money">
+                    <h1 style="color: red;">30$</h1>
+                    <span class="input_wrapper">
+                        <button id="minus_sausage" type="button" class="input_numbutton_left">-</button>
+                        <input class="input_num" type="number" value="0" min="0" id="sausage" name="sausage">
+                        <button id="plus_sausage" type="button" class="input_numbutton_right">+</button>
+                    </span>
+                </div>
+            </div>
+            <div class="item">
+                <div class="inside_img">
+
+                </div>
+                <div class="inside_main">
+                    <h1>炸薯條(一份)</h1>
+                    <h6>一開就有薯條</h6>
+                    <input type="hidden" id="flavor_fries" value="0">
+                </div>
+                <div class="inside_money">
+                    <h1 style="color: red;">35$</h1>
+                    <span class="input_wrapper">
+                        <button id="minus_fries" type="button" class="input_numbutton_left">-</button>
+                        <input class="input_num" type="number" value="0" min="0" id="fries" name="fries">
+                        <button id="plus_fries" type="button" class="input_numbutton_right">+</button>
+                    </span>
+                </div>
+            </div>
+            <div class="item">
+                <div class="inside_img">
+
+                </div>
+                <div class="inside_main">
+                    <h1>氣泡水(一杯)</h1>
+                    <h6>氣氣氣氣氣</h6>
+                    <select id="flavor_water"  onclick="updateTotal()">
+                        <option value="-1">請選擇</option>
+                        <option value="0">可爾必思 35元</option>
+                        <option value="1">石榴 40元</option>
+                        <option value="2">葡萄 40元</option>
+                        <option value="3">水蜜桃 40元</option>
+                        <option value="4">蘋果 40元</option>
+                    </select>
+                </div>
+                <div class="inside_money">
+                    <h1 style="color: red;">35$~40$</h1>
+                    <span class="input_wrapper">
+                        <button id="minus_water" type="button" class="input_numbutton_left">-</button>
+                        <input class="input_num" type="number" value="0" min="0" id="water" name="water">
+                        <button id="plus_water" type="button" class="input_numbutton_right">+</button>
+                    </span>
+                </div>
+            </div>
+            <hr>
+            <h1 align="center" style="margin:50px">總消費:<span id="total"></span>$</h1>
+            <h3 id="notLegal" align="center" style="color: red;display: none;">您有商品沒有選擇口味!</h3>
+            <div class="submit" onclick="submit()"><h2 align="center">送出訂單/結帳</h2></div>
+            <hr>
+        </form>
+        
+    </div>
+    <div id="orderNumber" class="orderNumber">
+        <h1 align="center">您的訂單編號:</h1>
+    </div>
+    <script>
+        const minus_icecream1 = document.querySelector("#minus_icecream1");
+        const plus_icecream1 = document.querySelector("#plus_icecream1");
+        const icecream1 = document.querySelector("#icecream1");
+
+        plus_icecream1.addEventListener("click", () => {
+            icecream1.value = parseInt(icecream1.value) + 1;
+            updateTotal();
+        });
+        minus_icecream1.addEventListener("click", () => {
+            if(icecream1.value > 0){
+                icecream1.value = parseInt(icecream1.value) - 1;
+                updateTotal();
+            }
+            
+        });
+        const minus_icecream2 = document.querySelector("#minus_icecream2");
+        const plus_icecream2 = document.querySelector("#plus_icecream2");
+        const icecream2 = document.querySelector("#icecream2");
+
+        plus_icecream2.addEventListener("click", () => {
+            icecream2.value = parseInt(icecream2.value) + 1;
+            updateTotal();
+        });
+        minus_icecream2.addEventListener("click", () => {
+            if(icecream2.value > 0){
+                icecream2.value = parseInt(icecream2.value) - 1;
+                updateTotal();
+            }
+            
+        });
+        const minus_icecream3 = document.querySelector("#minus_icecream3");
+        const plus_icecream3 = document.querySelector("#plus_icecream3");
+        const icecream3 = document.querySelector("#icecream3");
+
+        plus_icecream3.addEventListener("click", () => {
+            icecream3.value = parseInt(icecream3.value) + 1;
+            updateTotal();
+        });
+        minus_icecream3.addEventListener("click", () => {
+            if(icecream3.value > 0){
+                icecream3.value = parseInt(icecream3.value) - 1;
+                updateTotal();
+            }
+            
+        });
+        
+        const minus_sausage = document.querySelector("#minus_sausage");
+        const plus_sausage = document.querySelector("#plus_sausage");
+        const sausage = document.querySelector("#sausage");
+
+        plus_sausage.addEventListener("click", () => {
+            sausage.value = parseInt(sausage.value) + 1;
+            updateTotal();
+        });
+        minus_sausage.addEventListener("click", () => {
+            if(sausage.value > 0){
+                sausage.value = parseInt(sausage.value) - 1;
+                updateTotal();
+            }
+            
+        });
+        
+        const minus_fries = document.querySelector("#minus_fries");
+        const plus_fries = document.querySelector("#plus_fries");
+        const fries = document.querySelector("#fries");
+
+        plus_fries.addEventListener("click", () => {
+            fries.value = parseInt(fries.value) + 1;
+            updateTotal();
+        });
+        minus_fries.addEventListener("click", () => {
+            if(fries.value > 0){
+                fries.value = parseInt(fries.value) - 1;
+                updateTotal();
+            }
+            
+        });
+        
+        const minus_water = document.querySelector("#minus_water");
+        const plus_water = document.querySelector("#plus_water");
+        const water = document.querySelector("#water");
+
+        plus_water.addEventListener("click", () => {
+            water.value = parseInt(water.value) + 1;
+            updateTotal();
+        });
+        minus_water.addEventListener("click", () => {
+            if(water.value > 0){
+                water.value = parseInt(water.value) - 1;
+                updateTotal();
+            }
+            
+        });
+        updateTotal()
+        /*
+        {
+            "type":"order",
+            "item_list":[
+                {"id":"1",
+                "flavor":221,
+                "qty":1},
+                {"id":}
+            ]
+        }
+        */
+    </script>
+</body>
+</html>
+
+<!--[
+    "5":[{"0":30},{"1":40}]
+]-->
