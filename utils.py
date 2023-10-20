@@ -76,11 +76,12 @@ def get_all_data():
     return result
 
 def check_order_info(target_id):
-    # 查詢訂單資訊
     for i in get_all_data():
+        print(i[0])
         if i[0] == target_id: # id 對應到第0個數據
-            return i[10]
-        return 'error'
+            print(i)
+            return i[13]
+    return 'error'
 
 def upload_order_info(target_id, target_state):
     # 更新訂單資訊

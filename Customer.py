@@ -19,9 +19,9 @@ def menu():
 @app.route('/order', methods = ['GET'])
 def order():
     order_idx = request.args.get('idx')
-    print('he: ',order_idx)
+    print('he:','#'+order_idx)
 
-    state = check_order_info(order_idx)
+    state = check_order_info('#'+order_idx)
 
     if state != 'error':
         return render_template('orderNum.html', order_idx=order_idx, state=state)
