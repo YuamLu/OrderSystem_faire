@@ -73,15 +73,13 @@ def get_all_data():
     prompt = '''SELECT * FROM master'''
     cursor.execute(prompt)
     result = cursor.fetchall()
-    for i in result:
-        print(i)
+    return result
 
 def check_order_info(target_id):
     # 查詢訂單資訊
-    target_order = [i for i in get_all_data() if i['id'] == target_id]
     for i in get_all_data():
-        if i['id'] == target_id:
-            return i['state']
+        if i[0] == target_id: # id 對應到第0個數據
+            return i[10]
         return 'error'
 
 def upload_order_info(target_id, target_state):

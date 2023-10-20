@@ -11,7 +11,6 @@ def menu():
         data = json.loads(request.data)
         items = data['item_list']
         # [{'id': '0', 'flavor': '011', 'qty': '2'}]
-
         order_itx = create_order(items)
         return render_template('order.html', order_itx=order_itx, state='製作ing')
 
