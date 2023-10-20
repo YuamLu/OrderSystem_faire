@@ -61,7 +61,7 @@ def create_order(data):
     prompt = '''INSERT INTO master (id, 1_favor, 1_number, 2_favor, 2_number, 3_favor, 3_number, 4_favor, 4_number, 5_favor, 5_number, 6_favor, 6_number, status, total) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')'''.format(order_idx, ordered_data[0], ordered_data[1], ordered_data[2], ordered_data[3], ordered_data[4], ordered_data[5], ordered_data[6], ordered_data[7], ordered_data[8], ordered_data[9], ordered_data[10], ordered_data[11], '0', str(total_price))
     print(prompt)
     cursor.execute(prompt)
-
+    conn.commit()
     return order_idx
 
 # 測試
