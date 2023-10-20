@@ -3,7 +3,7 @@ from flask import Flask, render_template, request
 from utils import *
 import json
  
-app = Flask(__name__, template_folder='customer_templates')
+app = Flask(__name__, template_folder='websites')
 
 @app.route('/', methods = ["GET", "POST"])
 def menu():
@@ -12,16 +12,16 @@ def menu():
         items = data['item_list']
         # [{'id': '0', 'flavor': '011', 'qty': '2'}]
         order_itx = create_order(items)
-        return render_template('order.html', order_itx=order_itx, state='製作ing')
+        return render_template('orderNum.html', order_itx=order_itx, state='製作ing')
 
-    return render_template('menu.html')
+    return render_template('index.html')
 
 @app.route('/order', methods = ['GET'])
 def order():
     order_itx = request.args.get('idx')
-    state = check_order_info()
+    state = check_order_info(order_itx)
     if state != 'error':
-        return render_template('order.html', order_itx=order_itx, state=state)
+        return render_template('orderNum.html', order_itx=order_itx, state=state)
 
 
 if __name__ == '__main__':
