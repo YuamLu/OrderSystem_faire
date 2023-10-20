@@ -84,4 +84,8 @@ def check_order_info(target_id):
 
 def upload_order_info(target_id, target_state):
     # 更新訂單資訊
-    pass
+    prompt = '''UPDATE master SET status = '{}' WHERE id = '{}' ;'''.format(target_state, target_id)
+    print(prompt)
+    cursor.execute(prompt)
+    conn.commit()
+    return 'success'
