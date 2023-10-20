@@ -37,6 +37,12 @@ def order():
     else:
         return "Error with order info"
 
+@app.route('/css/bootstrap.min.css', methods = ['GET'])
+def bootstrap():
+    return render_template('css/bootstrap.min.css')
+@app.route('/css/bootstrap.min.css.map', methods = ['GET'])
+def bootstrapMap():
+    return render_template('css/bootstrap.min.css.map')
 
 if __name__ == '__main__':
     app.debug = True
