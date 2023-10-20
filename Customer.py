@@ -18,10 +18,15 @@ def menu():
 
 @app.route('/order', methods = ['GET'])
 def order():
-    order_itx = request.args.get('idx')
-    state = check_order_info(order_itx)
+    order_idx = request.args.get('idx')
+    print('he: ',order_idx)
+
+    state = check_order_info(order_idx)
+
     if state != 'error':
-        return render_template('orderNum.html', order_itx=order_itx, state=state)
+        return render_template('orderNum.html', order_idx=order_idx, state=state)
+    else:
+        return "Error with order info"
 
 
 if __name__ == '__main__':
