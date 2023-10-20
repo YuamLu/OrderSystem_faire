@@ -24,6 +24,14 @@ def order():
     state = check_order_info('#'+order_idx)
 
     if state != 'error':
+        if state == "0":
+            state = "未付款"
+        elif state == "1":
+            state = "製作中"
+        elif state == "2":
+            state = "待取餐"
+        else:
+            state = "已完成取餐"
         return render_template('orderNum.html', order_idx=order_idx, state=state)
     else:
         return "Error with order info"
