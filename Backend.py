@@ -15,9 +15,12 @@ def cashier():
 
 @app.route('/cashier_refresh', methods = ["GET"])
 def cashier_refresh(): # download orders info
-    orders = check_order_info()
-    orders = [i for i in orders if i['state'] != 3] # 排除已完成訂單
-    orders = sorted(orders, key=lambda x: x['state']) # 從未付款的代號0的訂單開始排序
+    orders = list(get_all_data())
+    orders = [i for i in orders if i['13'] != "3"] # 排除已完成訂單
+    orders = sorted(orders, key=lambda x: x['13']) # 從未付款的代號0的訂單開始排序
+
+    for o in orders:
+        print(o)
 
     return orders
 
